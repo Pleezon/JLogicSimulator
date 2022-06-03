@@ -44,6 +44,7 @@ public class FieldPane extends JPanel {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
                 lastMouseClickPoint = e.getPoint();
                 mouseDragOffset = null;
             }
@@ -71,6 +72,9 @@ public class FieldPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                System.out.println("lmcp: " + lastMouseClickPoint);
+                System.out.println("mdos: " + mouseDragOffset);
+                System.out.println("offs: " + offset);
                 if (lastMouseClickPoint != null) {
                     mouseDragOffset = new Point(
                             lastMouseClickPoint.x - e.getX(),
@@ -107,6 +111,7 @@ public class FieldPane extends JPanel {
 
     /**
      * Gets the currently applied scale factor.
+     *
      * @return The scale factor.
      */
     private float getScale() {
@@ -131,6 +136,7 @@ public class FieldPane extends JPanel {
      * transforming world points to screen. This includes both the current
      * offset, and any mouse drag offset if the mouse is currently being
      * dragged.
+     *
      * @return The true screen offset.
      */
     private Point2D.Float getScreenOffset() {
@@ -145,6 +151,7 @@ public class FieldPane extends JPanel {
 
     /**
      * Gets a transform that transforms world coordinates into screen coordinates.
+     *
      * @return The transformation.
      */
     private AffineTransform getWorldTransform() {
