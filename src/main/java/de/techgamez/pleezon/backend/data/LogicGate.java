@@ -14,6 +14,10 @@ public abstract class LogicGate extends LogicComponent {
     }
 
     public abstract boolean state(int activeInputs, int totalInputs);
+    /*
+    handling of a logic-gate's update-method; Made easier because of logic gates
+    only needing the amount of active and total inputs to compute their state
+     */
     public int triggerUpdate(World world){
         int amoActive = 0;
         for (long input : this.inputs) {

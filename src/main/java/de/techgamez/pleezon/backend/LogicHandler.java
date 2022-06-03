@@ -1,9 +1,23 @@
 package de.techgamez.pleezon.backend;
+
 import de.techgamez.pleezon.backend.data.LogicComponent;
+
 import java.util.*;
 
 public class LogicHandler {
+    /*
+    The logic handler is responsible for updating the state of the components.
+     */
+
+
+    /*
+    The world that is being updated.
+     */
     private final World world;
+    /*
+    The list of components that are currently in queue for being updated - with the amount of ticks in which they
+    need to be updated, respectfully.
+     */
     private final HashMap<Integer, ArrayList<Long>> updateQueue;
 
     public LogicHandler(World world) {
@@ -11,7 +25,9 @@ public class LogicHandler {
         updateQueue = new HashMap<>();
     }
 
-
+    /*
+    Updates a component and adds all it's children to the queue, with their respectful amount of ticks.
+     */
     public void updateFrom(long id) {
         LogicComponent component = world.components.get(id).component;
         if (component != null) {
@@ -24,6 +40,10 @@ public class LogicHandler {
         }
     }
 
+    /*
+    Method that is called every tick.
+    It updates all components that have to be updated (queue-ticks > 0)
+     */
     public void nextTick() {
         for (Map.Entry<Integer, ArrayList<Long>> e : updateQueue.entrySet()) {
             if (e.getKey() == 0) {

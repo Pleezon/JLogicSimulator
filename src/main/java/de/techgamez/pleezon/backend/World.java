@@ -10,11 +10,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class World {
+    /*
+    * The world is a collection of components.
+     */
 
+
+    /*
+    * Wrapper class for LogicComponent that also includes it's position relative to the world (for rendering)
+     */
     public static class WorldComponent {
         public LogicComponent component;
-        int x;
-        int y;
+        double x;
+        double y;
 
         public WorldComponent(LogicComponent component, int x, int y) {
             this.component = component;
@@ -23,10 +30,15 @@ public class World {
         }
     }
 
+    /*
+    a mapping of an ID to every component in the world.
+     */
     public HashMap<Long, WorldComponent> components;
 
-
-    private LogicHandler logicHandler;
+    /*
+    Instance for handling any kind of logic.
+     */
+    private final LogicHandler logicHandler;
 
     public World() {
         this(new HashMap<>());
@@ -37,8 +49,10 @@ public class World {
         this.logicHandler = new LogicHandler(this);
     }
 
-
-
+    /*
+    Saves the world and all it's states to a file (JSON).
+     */
+    @SuppressWarnings("")
     public void saveWorld(File file) throws IOException {
         file.delete();
         file.createNewFile();
@@ -51,6 +65,9 @@ public class World {
 
     }
 
+    /*
+    reads a world from a file (JSON).
+     */
     public static World fromFile(File file) throws IOException {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             StringBuilder res = new StringBuilder();

@@ -171,6 +171,7 @@ public class FieldPane extends JPanel {
         //test
         g2d.drawString("BLAH", 20, 20);
         g2d.drawRect(200, 200, 200, 200);
+
     }
 
 }
