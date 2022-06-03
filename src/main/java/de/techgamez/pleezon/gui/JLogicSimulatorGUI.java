@@ -18,8 +18,7 @@ public class JLogicSimulatorGUI extends JFrame {
         setPreferredSize(new Dimension(1920 / 2, 1080 / 2));
         this.topBar = new TopBar();
         this.fieldPane = new FieldPane();
-        this.add(topBar, BorderLayout.NORTH);
-        this.add(fieldPane, BorderLayout.CENTER);
+        add(fieldPane, BorderLayout.CENTER);
         pack();
         setLocationRelativeTo(null);
     }
