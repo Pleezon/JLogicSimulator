@@ -45,7 +45,7 @@ public class FieldPane extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 lastMouseClickPoint = e.getPoint();
-                mouseDragOffset = null;
+                mouseDragOffset = new Point(0, 0);
             }
 
             @Override
@@ -149,14 +149,11 @@ public class FieldPane extends JPanel {
      */
     private AffineTransform getWorldTransform() {
         AffineTransform tx = new AffineTransform();
-        // First translate to the center of the panel, and do all operations from there.
         tx.translate(getWidth() / 2.0, getHeight() / 2.0);
-        // Scale before our main translation.
         float s = getScale();
         tx.scale(s, s);
-        // Translate according to the screen offset, and reverse the effect of scaling so that translation is still valid for screen space.
-        Point2D.Float trueOffset = getScreenOffset();
-        tx.translate(trueOffset.x / s, trueOffset.y / s);
+        var screenOffset = getScreenOffset();
+        tx.translate(screenOffset.x / s, screenOffset.y / s);
 
         return tx;
     }
@@ -169,6 +166,7 @@ public class FieldPane extends JPanel {
         g2d.setTransform(worldTx);
 
         //test
+        g2d.fillOval(-1, -1, 2, 2);
         g2d.drawString("BLAH", 20, 20);
         g2d.drawRect(200, 200, 200, 200);
     }

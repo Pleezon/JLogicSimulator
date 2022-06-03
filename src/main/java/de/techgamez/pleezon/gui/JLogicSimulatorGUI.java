@@ -15,12 +15,12 @@ public class JLogicSimulatorGUI extends JFrame {
     public JLogicSimulatorGUI() {
         super(Constants.APP_NAME);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1920/2, 1080/2);
+        setPreferredSize(new Dimension(1920 / 2, 1080 / 2));
         this.topBar = new TopBar();
         this.fieldPane = new FieldPane();
         this.add(topBar, BorderLayout.NORTH);
         this.add(fieldPane, BorderLayout.CENTER);
-
-
+        pack();
+        setLocationRelativeTo(null);
     }
 }
