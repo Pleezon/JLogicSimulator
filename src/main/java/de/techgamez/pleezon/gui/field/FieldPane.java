@@ -13,10 +13,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class FieldPane extends JPanel {
-    private static final float[] SCALES = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f};
+    private static final float[] SCALES = {0.1f, 0.5f, 1.0f, 2.0f};
     private static final int DEFAULT_SCALE_INDEX = 2;
 
     public World world;
@@ -45,6 +46,7 @@ public class FieldPane extends JPanel {
     private int lastMouseButton = -1;
     private Point dragPos = null;
 
+    private final HashSet<WorldComponent> selectedComponents = new HashSet<>();
     JLogicSimulatorGUI gui;
 
     public void setWorld(World world) {
@@ -74,6 +76,7 @@ public class FieldPane extends JPanel {
                     offset.y -= mouseDragOffset.y;
                     mouseDragOffset = null;
                 }
+                repaint();
             }
 
             @Override
@@ -88,7 +91,7 @@ public class FieldPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (lastMouseButton == MouseEvent.BUTTON1) {
+                if (lastMouseButton == MouseEvent.BUTTON1 && e.isControlDown()) {
                     dragPos = e.getPoint();
                     repaint();
                 } else if (lastMouseButton == MouseEvent.BUTTON3) {
@@ -99,6 +102,8 @@ public class FieldPane extends JPanel {
                         );
                         repaint();
                     }
+                } else if (lastMouseButton == MouseEvent.BUTTON1) {
+                    // TODO: Implement drag to move all the selected components
                 }
 
             }
@@ -187,7 +192,19 @@ public class FieldPane extends JPanel {
         return tx;
     }
 
-    HashMap<Class<? extends WorldComponent>, BufferedImage> textureCache = new HashMap<>();
+    public static class CacheKey {
+
+        public WorldComponent.ComponentState state;
+        Class<? extends WorldComponent> clazz;
+
+        public CacheKey(Class<? extends WorldComponent> clazz, WorldComponent.ComponentState state) {
+            this.clazz = clazz;
+            this.state = state;
+        }
+
+    }
+
+    HashMap<CacheKey, BufferedImage> textureCache = new HashMap<>();
 
     @Override
     public void paintComponent(Graphics g) {
@@ -195,13 +212,48 @@ public class FieldPane extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform worldTx = getWorldTransform();
         g2d.setTransform(worldTx);
+
+
+        int selectionStartX = 0;
+        int selectionStartY = 0;
+        int selectionEndX = 0;
+        int selectionEndY = 0;
+
+        // Draw the selection rectangle, if any
+        if (dragPos != null) {
+            try {
+                // dragPos is the current drag's mouse position.
+                Point2D start = worldTx.inverseTransform(new Point2D.Double(dragPos.x, dragPos.y), null);
+                // lastMouseClickPoint is the position of the mouse when the drag started.
+                Point2D end = worldTx.inverseTransform(new Point2D.Double(lastMouseClickPoint.x, lastMouseClickPoint.y), null);
+                selectionStartX = (int) Math.min(start.getX(), end.getX());
+                selectionStartY = (int) Math.min(start.getY(), end.getY());
+                selectionEndX = (int) Math.max(start.getX(), end.getX());
+                selectionEndY = (int) Math.max(start.getY(), end.getY());
+                g2d.drawRect(selectionStartX, selectionStartY, (int) Math.abs(end.getX() - start.getX()), (int) Math.abs(end.getY() - start.getY()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        int finalStartX = selectionStartX;
+        int finalStartY = selectionStartY;
+        int finalEndX = selectionEndX;
+        int finalEndY = selectionEndY;
+        // draw each component
         if (world != null) {
-            g2d.drawRect(100, 100, 100, 100);
             world.components.forEach((k, v) -> {
+                boolean selected = v.checkForSelect(finalStartX, finalStartY, finalEndX, finalEndY);
+                if (selected) selectedComponents.add(v);
                 v.draw(g2d, textureCache);
             });
         }
-
     }
 
+    public void unselectComponents() {
+        for (WorldComponent c : selectedComponents) {
+            c.unselect();
+        }
+        selectedComponents.clear();
+        repaint();
+    }
 }

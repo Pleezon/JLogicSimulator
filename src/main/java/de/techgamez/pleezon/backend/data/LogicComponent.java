@@ -5,12 +5,8 @@ import de.techgamez.pleezon.backend.data.save.Blottable;
 import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
 import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public abstract class LogicComponent implements Blottable {
     private boolean state;
@@ -64,24 +60,8 @@ public abstract class LogicComponent implements Blottable {
 
     public abstract boolean hasOutputs();
 
-    protected abstract String texturePath();
+    public abstract String texturePath();
 
-    public BufferedImage texture() throws IOException {
-        BufferedImage texture = ImageIO.read(Objects.requireNonNull(getClass().getResource(texturePath())));
-        Color c = javax.swing.UIManager.getDefaults().getColor("Component.linkColor");
-        for (int x = 0; x < texture.getWidth(); x++) {
-            for (int y = 0; y < texture.getHeight(); y++) {
-                int rgb = texture.getRGB(x, y);
-                double medium = ((((rgb & 0xFF) + ((rgb >> 8) & 0xFF) + ((rgb >> 16) & 0xFF)) / 3.0) / 255.0);
-                if (medium < 0.6) {
-                    texture.setRGB(x, y, new Color(0, 0, 0, 0).getRGB());
-                }
-
-                texture.setRGB(x, y, new Color((int) (c.getRed() * medium), (int) (c.getGreen() * medium), (int) (c.getGreen() * medium)).getRGB());
-            }
-        }
-        return texture;
-    }
 
     public boolean getState() {
         return state;
