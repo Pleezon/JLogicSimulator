@@ -1,13 +1,14 @@
 package de.techgamez.pleezon.gui.field;
 
-import de.techgamez.pleezon.JLogicSimulator;
 import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
 import de.techgamez.pleezon.gui.field.component.WorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -41,16 +42,14 @@ public class FieldPane extends JPanel {
      * The offset applied due to a mouse drag that's currently in progress.
      */
     private Point mouseDragOffset = null;
+    private int lastMouseButton = -1;
+    private Point dragPos = null;
 
     JLogicSimulatorGUI gui;
 
     public void setWorld(World world) {
         this.world = world;
-        if(world == null){
-            Objects.requireNonNull(gui.topBar.fileButton.menu.saveMenuOption).setEnabled(false);
-        }else{
-            Objects.requireNonNull(gui.topBar.fileButton.menu.saveMenuOption).setEnabled(true);
-        }
+        Objects.requireNonNull(gui.topBar.fileButton.menu.saveMenuOption).setEnabled(world != null);
         repaint();
     }
 
@@ -59,13 +58,15 @@ public class FieldPane extends JPanel {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
+                lastMouseButton = e.getButton();
                 lastMouseClickPoint = e.getPoint();
                 mouseDragOffset = null;
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                lastMouseButton = -1;
+                dragPos = null;
                 lastMouseClickPoint = null;
                 // Apply the mouse drag, if any.
                 if (mouseDragOffset != null) {
@@ -87,13 +88,19 @@ public class FieldPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (lastMouseClickPoint != null) {
-                    mouseDragOffset = new Point(
-                            lastMouseClickPoint.x - e.getX(),
-                            lastMouseClickPoint.y - e.getY()
-                    );
+                if (lastMouseButton == MouseEvent.BUTTON1) {
+                    dragPos = e.getPoint();
                     repaint();
+                } else if (lastMouseButton == MouseEvent.BUTTON3) {
+                    if (lastMouseClickPoint != null) {
+                        mouseDragOffset = new Point(
+                                lastMouseClickPoint.x - e.getX(),
+                                lastMouseClickPoint.y - e.getY()
+                        );
+                        repaint();
+                    }
                 }
+
             }
         };
         addMouseListener(mouseAdapter);
@@ -189,11 +196,12 @@ public class FieldPane extends JPanel {
         AffineTransform worldTx = getWorldTransform();
         g2d.setTransform(worldTx);
         if (world != null) {
-            g2d.drawRect(100,100,100,100);
+            g2d.drawRect(100, 100, 100, 100);
             world.components.forEach((k, v) -> {
-                v.draw(g2d,textureCache);
+                v.draw(g2d, textureCache);
             });
         }
+
     }
 
 }

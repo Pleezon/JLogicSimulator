@@ -41,7 +41,6 @@ public class World {
         this.components = components;
         this.logicHandler = new LogicHandler(this);
         this.file = saveLocation;
-        //components.put(0L, new WorldComponent(new ANDGate(), 100, 100));
     }
 
     /*
