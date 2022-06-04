@@ -1,6 +1,5 @@
 package de.techgamez.pleezon.backend;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.techgamez.pleezon.backend.data.ComponentMap;
 import de.techgamez.pleezon.backend.data.impl.gates.ANDGate;
 import de.techgamez.pleezon.gui.field.component.WorldComponent;
@@ -53,8 +52,7 @@ public class World {
         file.delete();
         file.createNewFile();
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(fos, components);
+
         }
     }
 
@@ -63,10 +61,9 @@ public class World {
      */
     public static World fromFile(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String str = new String(fis.readAllBytes());
-            return new World(objectMapper.readValue(str, ComponentMap.class), file);
+            System.out.println("Loading world from file");
         }
+        return null;
     }
 
 }
