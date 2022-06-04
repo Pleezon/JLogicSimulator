@@ -5,7 +5,8 @@ import de.techgamez.pleezon.backend.data.LogicGate;
 public class ORGate extends LogicGate {
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/gates/OR.png";
+
     }
 
     /*

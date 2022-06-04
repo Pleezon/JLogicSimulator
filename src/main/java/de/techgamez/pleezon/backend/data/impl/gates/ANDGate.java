@@ -1,13 +1,12 @@
 package de.techgamez.pleezon.backend.data.impl.gates;
 
-import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.backend.data.LogicGate;
 
 public class ANDGate extends LogicGate {
 
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/gates/AND.png";
     }
 
     /*

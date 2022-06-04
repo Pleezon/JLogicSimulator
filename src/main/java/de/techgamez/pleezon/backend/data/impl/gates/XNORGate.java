@@ -7,7 +7,7 @@ public class XNORGate extends LogicGate {
 
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/gates/XNOR.png";
     }
 
     /*

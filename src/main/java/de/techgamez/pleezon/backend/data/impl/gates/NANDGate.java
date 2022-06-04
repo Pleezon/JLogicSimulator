@@ -7,7 +7,7 @@ public class NANDGate extends LogicGate {
 
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/gates/NAND.png";
     }
 
     /*

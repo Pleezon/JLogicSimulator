@@ -1,5 +1,6 @@
 package de.techgamez.pleezon.gui.topbar.file;
 
+import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
 import de.techgamez.pleezon.gui.topbar.file.create.CreateMenuOption;
 import de.techgamez.pleezon.gui.topbar.file.open.OpenMenuOption;
 import de.techgamez.pleezon.gui.topbar.file.save.SaveMenuOption;
@@ -9,15 +10,16 @@ import java.sql.Savepoint;
 
 public class FileButtonMenu extends JPopupMenu {
 
-    CreateMenuOption createMenuOption;
-    SaveMenuOption saveMenuOption;
-    OpenMenuOption openMenuOption;
-
-    public FileButtonMenu() {
+    public CreateMenuOption createMenuOption;
+    public SaveMenuOption saveMenuOption;
+    public OpenMenuOption openMenuOption;
+    JLogicSimulatorGUI gui;
+    public FileButtonMenu(JLogicSimulatorGUI gui) {
         super();
-        createMenuOption = new CreateMenuOption();
-        saveMenuOption = new SaveMenuOption();
-        openMenuOption = new OpenMenuOption();
+        this.gui = gui;
+        createMenuOption = new CreateMenuOption(gui);
+        saveMenuOption = new SaveMenuOption(gui);
+        openMenuOption = new OpenMenuOption(gui);
 
 
         this.add(createMenuOption);

@@ -1,18 +1,24 @@
 package de.techgamez.pleezon.gui.field;
 
+import de.techgamez.pleezon.JLogicSimulator;
 import de.techgamez.pleezon.backend.World;
+import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
+import de.techgamez.pleezon.gui.field.component.WorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class FieldPane extends JPanel {
     private static final float[] SCALES = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f};
     private static final int DEFAULT_SCALE_INDEX = 2;
 
-    World world;
+    public World world;
 
     /**
      * The offset, in terms of screen coordinates, from the default view.
@@ -36,11 +42,20 @@ public class FieldPane extends JPanel {
      */
     private Point mouseDragOffset = null;
 
+    JLogicSimulatorGUI gui;
+
     public void setWorld(World world) {
         this.world = world;
+        if(world == null){
+            Objects.requireNonNull(gui.topBar.fileButton.menu.saveMenuOption).setEnabled(false);
+        }else{
+            Objects.requireNonNull(gui.topBar.fileButton.menu.saveMenuOption).setEnabled(true);
+        }
+        repaint();
     }
 
-    public FieldPane() {
+    public FieldPane(JLogicSimulatorGUI gui) {
+        this.gui = gui;
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -72,9 +87,6 @@ public class FieldPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                System.out.println("lmcp: " + lastMouseClickPoint);
-                System.out.println("mdos: " + mouseDragOffset);
-                System.out.println("offs: " + offset);
                 if (lastMouseClickPoint != null) {
                     mouseDragOffset = new Point(
                             lastMouseClickPoint.x - e.getX(),
@@ -168,17 +180,20 @@ public class FieldPane extends JPanel {
         return tx;
     }
 
+    HashMap<Class<? extends WorldComponent>, BufferedImage> textureCache = new HashMap<>();
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform worldTx = getWorldTransform();
         g2d.setTransform(worldTx);
-
-        //test
-        g2d.drawString("BLAH", 20, 20);
-        g2d.drawRect(200, 200, 200, 200);
-
+        if (world != null) {
+            g2d.drawRect(100,100,100,100);
+            world.components.forEach((k, v) -> {
+                v.draw(g2d,textureCache);
+            });
+        }
     }
 
 }

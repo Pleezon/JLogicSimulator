@@ -10,14 +10,14 @@ import java.awt.*;
 
 public class JLogicSimulatorGUI extends JFrame {
 
-    TopBar topBar;
-    FieldPane fieldPane;
+    public TopBar topBar;
+    public FieldPane fieldPane;
     public JLogicSimulatorGUI() {
         super(Constants.APP_NAME);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1920/2, 1080/2);
-        this.topBar = new TopBar();
-        this.fieldPane = new FieldPane();
+        this.topBar = new TopBar(this);
+        this.fieldPane = new FieldPane(this);
         this.add(topBar, BorderLayout.NORTH);
         this.add(fieldPane, BorderLayout.CENTER);
 

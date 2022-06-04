@@ -6,7 +6,7 @@ public class NORGate extends LogicGate {
 
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/gates/NOR.png";
     }
 
     /*

@@ -2,7 +2,6 @@ package de.techgamez.pleezon.backend.data;
 
 import de.techgamez.pleezon.backend.World;
 
-import java.util.ArrayList;
 
 public abstract class LogicGate extends LogicComponent {
 
@@ -41,5 +40,4 @@ public abstract class LogicGate extends LogicComponent {
     public int triggerClick(World world) {
         return -1;
     }
-
 }

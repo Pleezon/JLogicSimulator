@@ -3,7 +3,7 @@ package de.techgamez.pleezon.backend.data.impl.misc;
 import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.backend.data.LogicComponent;
 
-public class Switch extends LogicComponent {
+public class Switch extends LogicComponent{
 
     public Switch() {
         super();
@@ -34,7 +34,5 @@ public class Switch extends LogicComponent {
     public String texturePath() {
         return null;
     }
-
-
 }
 
