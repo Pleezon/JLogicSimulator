@@ -1,6 +1,9 @@
 package de.techgamez.pleezon.backend.data;
 
 import de.techgamez.pleezon.backend.World;
+import de.techgamez.pleezon.backend.data.save.Blottable;
+import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
+import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -9,9 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public abstract class LogicComponent {
+public abstract class LogicComponent implements Blottable {
     private boolean state;
-
     protected ArrayList<Long> inputs;
     protected ArrayList<Long> outputs;
 
@@ -23,6 +25,32 @@ public abstract class LogicComponent {
 
     public LogicComponent() {
         this(new ArrayList<>(), new ArrayList<>(), false);
+    }
+
+    @Override
+    public void blot(BlotterOutputStream out) throws IOException {
+        out.writeBoolean(state);
+        out.writeInt(inputs.size());
+        for (Long input : inputs) {
+            out.writeLong(input);
+        }
+        out.writeInt(outputs.size());
+        for (Long output : outputs) {
+            out.writeLong(output);
+        }
+    }
+
+    @Override
+    public void unblot(BlotterInputStream in) throws IOException {
+        state = in.readBoolean();
+        int size = in.readInt();
+        for (int i = 0; i < size; i++) {
+            inputs.add(in.readLong());
+        }
+        size = in.readInt();
+        for (int i = 0; i < size; i++) {
+            outputs.add(in.readLong());
+        }
     }
 
     /*

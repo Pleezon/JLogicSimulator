@@ -1,8 +1,8 @@
 package de.techgamez.pleezon.backend;
 
 import de.techgamez.pleezon.backend.data.ComponentMap;
-import de.techgamez.pleezon.backend.data.impl.gates.ANDGate;
-import de.techgamez.pleezon.gui.field.component.WorldComponent;
+import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
+import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +41,7 @@ public class World {
         this.components = components;
         this.logicHandler = new LogicHandler(this);
         this.file = saveLocation;
-        components.put(0L, new WorldComponent(new ANDGate(), 100, 100));
+        //components.put(0L, new WorldComponent(new ANDGate(), 100, 100));
     }
 
     /*
@@ -51,8 +51,8 @@ public class World {
     public void saveWorld() throws IOException {
         file.delete();
         file.createNewFile();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-
+        try (BlotterOutputStream bos = new BlotterOutputStream(new FileOutputStream(file))) {
+            components.blot(bos);
         }
     }
 
@@ -60,10 +60,11 @@ public class World {
     reads a world from a file (JSON).
      */
     public static World fromFile(File file) throws IOException {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            System.out.println("Loading world from file");
+        try (BlotterInputStream bis = new BlotterInputStream(new FileInputStream(file))) {
+            ComponentMap components = new ComponentMap();
+            components.unblot(bis);
+            return new World(components, file);
         }
-        return null;
     }
 
 }
