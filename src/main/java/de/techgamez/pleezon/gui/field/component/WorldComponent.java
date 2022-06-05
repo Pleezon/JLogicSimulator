@@ -66,7 +66,7 @@ public class WorldComponent implements Blottable {
     }
 
 
-    public void draw(Graphics2D g, HashMap<FieldPane.CacheKey, BufferedImage> textureCache) {
+    public void draw(Graphics2D g, HashMap<FieldPane.CacheKey, BufferedImage> textureCache, int offX, int offY) {
         try {
             BufferedImage texture;
             FieldPane.CacheKey key = new FieldPane.CacheKey(this.getClass(), state);
@@ -76,7 +76,7 @@ public class WorldComponent implements Blottable {
                 texture = texture();
                 textureCache.put(key, texture);
             }
-            g.drawImage(texture, null, (int) x, (int) y);
+            g.drawImage(texture, null, (int) x - offX, (int) y - offY);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

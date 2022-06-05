@@ -40,9 +40,15 @@ public class FieldPane extends JPanel {
     private Point lastMouseClickPoint = null;
 
     /**
-     * The offset applied due to a mouse drag that's currently in progress.
+     * The offset applied to camera movement due to a mouse drag that's currently in progress.
      */
-    private Point mouseDragOffset = null;
+    private Point cameraMoveDragOffset = null;
+
+
+    /*
+     * The offset applied to selection movement due to a mouse drag that's currently in progress.
+     */
+    private Point selectionMoveDragOffset = null;
     private int lastMouseButton = -1;
     private Point dragPos = null;
 
@@ -62,7 +68,7 @@ public class FieldPane extends JPanel {
             public void mousePressed(MouseEvent e) {
                 lastMouseButton = e.getButton();
                 lastMouseClickPoint = e.getPoint();
-                mouseDragOffset = null;
+                cameraMoveDragOffset = null;
             }
 
             @Override
@@ -71,10 +77,23 @@ public class FieldPane extends JPanel {
                 dragPos = null;
                 lastMouseClickPoint = null;
                 // Apply the mouse drag, if any.
-                if (mouseDragOffset != null) {
-                    offset.x -= mouseDragOffset.x;
-                    offset.y -= mouseDragOffset.y;
-                    mouseDragOffset = null;
+                if (cameraMoveDragOffset != null) {
+                    offset.x -= cameraMoveDragOffset.x;
+                    offset.y -= cameraMoveDragOffset.y;
+                    cameraMoveDragOffset = null;
+                }
+                // Apply the component drag, if any.
+                if (selectionMoveDragOffset != null) {
+
+                    AffineTransform tf = getWorldTransform();
+                    Point2D transformedDragPos = tf.transform(selectionMoveDragOffset, null);
+                    Point2D transformedOrigin = tf.transform(new Point(0, 0), null);
+
+                    for (WorldComponent component : selectedComponents) {
+                        component.x = component.x - ((transformedDragPos.getX() - transformedOrigin.getX()));
+                        component.y = component.y - ((transformedDragPos.getY() - transformedOrigin.getY()));
+                    }
+                    selectionMoveDragOffset = null;
                 }
                 repaint();
             }
@@ -91,19 +110,18 @@ public class FieldPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                if (lastMouseClickPoint == null) return;
                 if (lastMouseButton == MouseEvent.BUTTON1 && e.isControlDown()) {
                     dragPos = e.getPoint();
                     repaint();
                 } else if (lastMouseButton == MouseEvent.BUTTON3) {
-                    if (lastMouseClickPoint != null) {
-                        mouseDragOffset = new Point(
-                                lastMouseClickPoint.x - e.getX(),
-                                lastMouseClickPoint.y - e.getY()
-                        );
-                        repaint();
-                    }
+
+                    cameraMoveDragOffset = new Point(lastMouseClickPoint.x - e.getX(), lastMouseClickPoint.y - e.getY());
+                    repaint();
+
                 } else if (lastMouseButton == MouseEvent.BUTTON1) {
-                    // TODO: Implement drag to move all the selected components
+                    selectionMoveDragOffset = new Point(lastMouseClickPoint.x - e.getX(), lastMouseClickPoint.y - e.getY());
+                    repaint();
                 }
 
             }
@@ -149,7 +167,8 @@ public class FieldPane extends JPanel {
     public void resetView() {
         this.offset.x = 0;
         this.offset.y = 0;
-        this.mouseDragOffset = null;
+        this.cameraMoveDragOffset = null;
+
         this.lastMouseClickPoint = null;
         this.scaleIndex = DEFAULT_SCALE_INDEX;
         repaint();
@@ -166,9 +185,9 @@ public class FieldPane extends JPanel {
     private Point2D.Float getScreenOffset() {
         float x = offset.x;
         float y = offset.y;
-        if (mouseDragOffset != null) {
-            x -= mouseDragOffset.x;
-            y -= mouseDragOffset.y;
+        if (cameraMoveDragOffset != null) {
+            x -= cameraMoveDragOffset.x;
+            y -= cameraMoveDragOffset.y;
         }
         return new Point2D.Float(x, y);
     }
@@ -243,8 +262,19 @@ public class FieldPane extends JPanel {
         if (world != null) {
             world.components.forEach((k, v) -> {
                 boolean selected = v.checkForSelect(finalStartX, finalStartY, finalEndX, finalEndY);
+                int offX = 0;
+                int offY = 0;
                 if (selected) selectedComponents.add(v);
-                v.draw(g2d, textureCache);
+
+                if (selectedComponents.contains(v) && selectionMoveDragOffset != null) {
+                    Point2D transformedOffset = worldTx.transform(selectionMoveDragOffset, null);
+                    Point2D transformedOrigin = worldTx.transform(new Point2D.Double(0, 0), null);
+                    offX = (int) ((transformedOffset.getX() - transformedOrigin.getX()));
+                    offY = (int) ((transformedOffset.getY() - transformedOrigin.getY()));
+                    System.out.println("selectOffset: " + selectionMoveDragOffset.x + ", " + selectionMoveDragOffset.y);
+                    System.out.println("offset: " + offX + ", " + offY);
+                }
+                v.draw(g2d, textureCache, offX, offY);
             });
         }
     }
