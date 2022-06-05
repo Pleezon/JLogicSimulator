@@ -10,12 +10,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
-
+/*
+todo: refactor this class; split it up & make each feature have it's own render method with worldTransform (screen -> world) and screenTransform (world -> screen)
+ */
 public class FieldPane extends JPanel {
     private static final float[] SCALES = {0.1f, 0.5f, 1.0f, 2.0f};
     private static final int DEFAULT_SCALE_INDEX = 2;
@@ -86,8 +89,15 @@ public class FieldPane extends JPanel {
                 if (selectionMoveDragOffset != null) {
 
                     AffineTransform tf = getWorldTransform();
-                    Point2D transformedDragPos = tf.transform(selectionMoveDragOffset, null);
-                    Point2D transformedOrigin = tf.transform(new Point(0, 0), null);
+                    Point2D transformedDragPos = null;
+                    Point2D transformedOrigin = null;
+                    try {
+                        transformedDragPos = tf.inverseTransform(selectionMoveDragOffset, null);
+                        transformedOrigin = tf.inverseTransform(new Point(0, 0), null);
+
+                    } catch (NoninvertibleTransformException ex) {
+                        throw new RuntimeException(ex);
+                    }
 
                     for (WorldComponent component : selectedComponents) {
                         component.x = component.x - ((transformedDragPos.getX() - transformedOrigin.getX()));
@@ -115,15 +125,12 @@ public class FieldPane extends JPanel {
                     dragPos = e.getPoint();
                     repaint();
                 } else if (lastMouseButton == MouseEvent.BUTTON3) {
-
                     cameraMoveDragOffset = new Point(lastMouseClickPoint.x - e.getX(), lastMouseClickPoint.y - e.getY());
                     repaint();
-
                 } else if (lastMouseButton == MouseEvent.BUTTON1) {
-                    selectionMoveDragOffset = new Point(lastMouseClickPoint.x - e.getX(), lastMouseClickPoint.y - e.getY());
+                    selectionMoveDragOffset = new Point((lastMouseClickPoint.x - e.getX()), (lastMouseClickPoint.y - e.getY()));
                     repaint();
                 }
-
             }
         };
         addMouseListener(mouseAdapter);
@@ -231,8 +238,6 @@ public class FieldPane extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform worldTx = getWorldTransform();
         g2d.setTransform(worldTx);
-
-
         int selectionStartX = 0;
         int selectionStartY = 0;
         int selectionEndX = 0;
@@ -267,10 +272,21 @@ public class FieldPane extends JPanel {
                 if (selected) selectedComponents.add(v);
 
                 if (selectedComponents.contains(v) && selectionMoveDragOffset != null) {
-                    Point2D transformedOffset = worldTx.transform(selectionMoveDragOffset, null);
-                    Point2D transformedOrigin = worldTx.transform(new Point2D.Double(0, 0), null);
+                    //Point2D transformedOffset = worldTx.transform(selectionMoveDragOffset, null);
+                    //Point2D transformedOrigin = worldTx.transform(new Point2D.Double(0, 0), null);
+                    //offX = (int) ((transformedOffset.getX() - transformedOrigin.getX()));
+                    //offY = (int) ((transformedOffset.getY() - transformedOrigin.getY()));
+                    Point2D transformedOffset = null;
+                    Point2D transformedOrigin = null;
+                    try {
+                        transformedOffset = worldTx.inverseTransform(selectionMoveDragOffset, null);
+                        transformedOrigin = worldTx.inverseTransform(new Point(0, 0), null);
+                    } catch (NoninvertibleTransformException e) {
+                        throw new RuntimeException(e);
+                    }
                     offX = (int) ((transformedOffset.getX() - transformedOrigin.getX()));
                     offY = (int) ((transformedOffset.getY() - transformedOrigin.getY()));
+
                     System.out.println("selectOffset: " + selectionMoveDragOffset.x + ", " + selectionMoveDragOffset.y);
                     System.out.println("offset: " + offX + ", " + offY);
                 }
