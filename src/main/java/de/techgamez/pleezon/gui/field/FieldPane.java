@@ -10,9 +10,7 @@ import de.techgamez.pleezon.gui.field.actions.impl.undo.UndoRedoHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -30,8 +28,8 @@ public class FieldPane extends JPanel {
 
     private AffineTransform worldTx = null;
     private AffineTransform screenTx = null;
-
     JLogicSimulatorGUI gui;
+    private Point mousePos = null;
 
     ArrayList<ActionHandler> actions = new ArrayList<>();
 
@@ -132,6 +130,13 @@ public class FieldPane extends JPanel {
                     repaint();
                 }
             }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                mousePos = e.getPoint();
+                updateTransform();
+            }
         };
         addMouseListener(mouseAdapter);
         addMouseWheelListener(mouseAdapter);
@@ -149,6 +154,14 @@ public class FieldPane extends JPanel {
             a.registerInputs(inputMap);
             a.registerActions(actionMap);
         }
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateTransform();
+                repaint();
+            }
+        });
+
         updateTransform();
     }
 

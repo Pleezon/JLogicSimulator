@@ -39,12 +39,10 @@ public class SelectionHandler extends ActionHandler {
         if (currentSelection != null) {
             Color c = g2d.getColor();
             if (selectionType == SelectionType.SELECT) {
-                g2d.setColor(Color.GREEN);
-
+                g2d.setColor(javax.swing.UIManager.getDefaults().getColor("Component.accentColor"));
             }
             if (selectionType == SelectionType.UNSELECT) {
-                g2d.setColor(Color.RED);
-
+                g2d.setColor(javax.swing.UIManager.getDefaults().getColor("Component.error.focusedBorderColor"));
             }
             g2d.drawRect(currentSelection.x, currentSelection.y, currentSelection.width, currentSelection.height);
             g2d.setColor(c);

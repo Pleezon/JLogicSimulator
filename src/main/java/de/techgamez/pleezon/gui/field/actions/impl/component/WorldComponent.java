@@ -19,9 +19,9 @@ public class WorldComponent implements Blottable {
     private static class TextureCache {
         private static class CacheKey {
             public WorldComponent.ComponentState state;
-            Class<? extends WorldComponent> clazz;
+            Class<? extends LogicComponent> clazz;
 
-            public CacheKey(Class<? extends WorldComponent> clazz, WorldComponent.ComponentState state) {
+            public CacheKey(Class<? extends LogicComponent> clazz, WorldComponent.ComponentState state) {
                 this.clazz = clazz;
                 this.state = state;
             }
@@ -43,7 +43,7 @@ public class WorldComponent implements Blottable {
         private final HashMap<CacheKey, BufferedImage> cache = new HashMap<>();
 
         public BufferedImage retrieve(WorldComponent component) throws IOException {
-            CacheKey key = new CacheKey(component.getClass(), component.state);
+            CacheKey key = new CacheKey(component.component.getClass(), component.state);
             if (cache.containsKey(key)) {
                 return cache.get(key);
             }
