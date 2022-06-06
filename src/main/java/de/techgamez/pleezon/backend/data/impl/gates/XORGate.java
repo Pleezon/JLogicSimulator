@@ -4,6 +4,7 @@ import de.techgamez.pleezon.backend.data.LogicGate;
 
 public class XORGate extends LogicGate {
 
+
     @Override
     public String texturePath() {
         return "/textures/gates/XOR.png";

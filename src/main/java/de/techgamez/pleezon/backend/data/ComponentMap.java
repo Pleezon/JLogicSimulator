@@ -3,7 +3,7 @@ package de.techgamez.pleezon.backend.data;
 import de.techgamez.pleezon.backend.data.save.Blottable;
 import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
 import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
-import de.techgamez.pleezon.gui.field.component.WorldComponent;
+import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
 
 import java.io.IOException;
 import java.util.HashMap;

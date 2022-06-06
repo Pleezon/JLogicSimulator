@@ -2,7 +2,9 @@ package de.techgamez.pleezon.backend;
 
 import de.techgamez.pleezon.backend.data.LogicComponent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LogicHandler {
     /*
@@ -29,7 +31,7 @@ public class LogicHandler {
     Updates a component and adds all it's children to the queue, with their respectful amount of ticks.
      */
     public void updateFrom(long id) {
-        LogicComponent component = world.components.get(id).component;
+        LogicComponent component = world.getComponents().get(id).component;
         if (component != null) {
             int ticks = component.triggerUpdate(this.world);
             if (ticks > 0) {

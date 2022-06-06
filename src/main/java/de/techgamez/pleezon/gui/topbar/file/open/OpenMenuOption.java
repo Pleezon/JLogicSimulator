@@ -14,11 +14,11 @@ public class OpenMenuOption extends JMenuItem {
         super("Open");
         this.gui = gui;
         this.addActionListener((e) -> {
-            if(gui.fieldPane.world != null) {
+            if (gui.fieldPane.getWorld() != null) {
                 int result = JOptionPane.showConfirmDialog(gui, "Do you want to save the current world?", "Save current world?", JOptionPane.YES_NO_CANCEL_OPTION);
-                if(result == JOptionPane.YES_OPTION) {
+                if (result == JOptionPane.YES_OPTION) {
                     try {
-                        gui.fieldPane.world.saveWorld();
+                        gui.fieldPane.getWorld().saveWorld();
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -42,7 +42,7 @@ public class OpenMenuOption extends JMenuItem {
             if (fc.showOpenDialog(gui) == JFileChooser.APPROVE_OPTION) {
                 try {
                     String path = fc.getSelectedFile().getAbsolutePath();
-                    if(!path.endsWith(".jls")) path += ".jls";
+                    if (!path.endsWith(".jls")) path += ".jls";
                     World w = World.fromFile(new File(path));
                     gui.fieldPane.setWorld(w);
                 } catch (IOException ex) {

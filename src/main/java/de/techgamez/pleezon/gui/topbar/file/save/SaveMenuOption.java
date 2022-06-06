@@ -10,11 +10,12 @@ public class SaveMenuOption extends JMenuItem {
 
     public SaveMenuOption(JLogicSimulatorGUI gui) {
         super("Save");
-        if(!(this.gui != null && this.gui.fieldPane != null && this.gui.fieldPane.world != null))this.setEnabled(false);
+        if (!(this.gui != null && this.gui.fieldPane != null && this.gui.fieldPane.getWorld() != null))
+            this.setEnabled(false);
         this.gui = gui;
         this.addActionListener((e) -> {
             try {
-                gui.fieldPane.world.saveWorld();
+                gui.fieldPane.getWorld().saveWorld();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

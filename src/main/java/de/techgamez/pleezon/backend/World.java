@@ -3,38 +3,50 @@ package de.techgamez.pleezon.backend;
 import de.techgamez.pleezon.backend.data.ComponentMap;
 import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
 import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
+import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.UUID;
 
 public class World {
-    /*
-     * The world is a collection of components.
-     */
-
     /*
     the location the world is saved in
      */ File file;
 
-    /*
-     * Wrapper class for LogicComponent that also includes it's position relative to the world (for rendering)
-     */
+    private final ComponentMap components;
 
-    /*
-    a mapping of an ID to every component in the world.
-     */
-
-    public ComponentMap components;
-
-    /*
-    Instance for handling any kind of logic.
-     */
     private final LogicHandler logicHandler;
 
     public World(File location) {
         this(new ComponentMap(), location);
+    }
+
+    public void addComponent(WorldComponent component) {
+        long id = 0;
+        while (components.containsKey(id)) {
+            id = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+        }
+        components.put(id, component);
+        component.component.setID(id);
+    }
+
+    public void deleteComponent(WorldComponent component) {
+        components.remove(component.component.getID());
+    }
+
+    public WorldComponent[] getComponentsAt(Point2D p) {
+        LinkedList<WorldComponent> componentsToSelect = new LinkedList<>();
+        for (WorldComponent component : getComponents().values()) {
+            if (component.isInHitbox(p, false)) {
+                componentsToSelect.add(component);
+            }
+        }
+        return componentsToSelect.toArray(new WorldComponent[0]);
     }
 
     public World(ComponentMap components, File saveLocation) {
@@ -64,6 +76,10 @@ public class World {
             components.unblot(bis);
             return new World(components, file);
         }
+    }
+
+    public ComponentMap getComponents() {
+        return components;
     }
 
 }

@@ -7,25 +7,42 @@ import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public abstract class LogicComponent implements Blottable {
     private boolean state;
     protected ArrayList<Long> inputs;
     protected ArrayList<Long> outputs;
 
-    public LogicComponent(ArrayList<Long> inputs, ArrayList<Long> outputs, boolean state) {
+    private long id;
+
+    public long getID() {
+        return this.id;
+    }
+
+    public void setID(long id) {
+        this.id = id;
+    }
+
+    public LogicComponent(ArrayList<Long> inputs, ArrayList<Long> outputs, boolean state, long id) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.state = state;
+        this.id = id;
     }
 
     public LogicComponent() {
-        this(new ArrayList<>(), new ArrayList<>(), false);
+        this(new ArrayList<>(), new ArrayList<>(), false, 0);
+    }
+
+    public LogicComponent(long id) {
+        this(new ArrayList<>(), new ArrayList<>(), false, id);
     }
 
     @Override
     public void blot(BlotterOutputStream out) throws IOException {
         out.writeBoolean(state);
+        out.writeLong(id);
         out.writeInt(inputs.size());
         for (Long input : inputs) {
             out.writeLong(input);
@@ -39,6 +56,7 @@ public abstract class LogicComponent implements Blottable {
     @Override
     public void unblot(BlotterInputStream in) throws IOException {
         state = in.readBoolean();
+        id = in.readLong();
         int size = in.readInt();
         for (int i = 0; i < size; i++) {
             inputs.add(in.readLong());
@@ -112,4 +130,16 @@ public abstract class LogicComponent implements Blottable {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LogicComponent component = (LogicComponent) o;
+        return state == component.state && inputs.equals(component.inputs) && outputs.equals(component.outputs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, inputs, outputs);
+    }
 }

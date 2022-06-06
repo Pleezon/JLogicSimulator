@@ -4,6 +4,7 @@ import de.techgamez.pleezon.backend.data.LogicGate;
 
 public class ANDGate extends LogicGate {
 
+
     @Override
     public String texturePath() {
         return "/textures/gates/AND.png";
