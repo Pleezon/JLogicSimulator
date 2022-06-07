@@ -74,9 +74,9 @@ public abstract class LogicComponent implements Blottable {
 
     public abstract int triggerClick(World world);
 
-    public abstract boolean hasInputs();
+    public abstract int maxInputs();
 
-    public abstract boolean hasOutputs();
+    public abstract int maxOutputs();
 
     public abstract String texturePath();
 
@@ -90,13 +90,13 @@ public abstract class LogicComponent implements Blottable {
     }
 
     private void checkInputModification() throws IllegalStateModificationException {
-        if (!hasInputs()) {
+        if (maxInputs() == 0) {
             throw new IllegalStateModificationException("This component has no inputs");
         }
     }
 
     private void checkOutputModification() throws IllegalStateModificationException {
-        if (!hasOutputs()) {
+        if (maxOutputs() == 0) {
             throw new IllegalStateModificationException("This component has no outputs");
         }
     }

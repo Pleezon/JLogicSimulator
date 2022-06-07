@@ -166,6 +166,8 @@ public class WorldComponent implements Blottable {
 
     @Override
     public void blot(BlotterOutputStream out) throws IOException {
+        // TODO: optimize by not writing the same data twice (e.g. using IDs instead of class name)
+        // these strings are humongous
         out.writeString(component.getClass().getName());
         component.blot(out);
         out.writeDouble(x);

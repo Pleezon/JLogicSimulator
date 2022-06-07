@@ -50,6 +50,7 @@ public class OpenMenuOption extends JMenuItem {
                         System.out.println(value.component.getClass().getName());
                     }
                     gui.fieldPane.setWorld(w);
+
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }

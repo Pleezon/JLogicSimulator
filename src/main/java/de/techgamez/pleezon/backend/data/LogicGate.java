@@ -6,8 +6,12 @@ import de.techgamez.pleezon.backend.World;
 public abstract class LogicGate extends LogicComponent {
 
 
-    public boolean hasInputs() {
-        return true;
+    public int maxInputs() {
+        return Integer.MAX_VALUE;
+    }
+
+    public int maxOutputs() {
+        return Integer.MAX_VALUE;
     }
 
     public boolean hasOutputs() {

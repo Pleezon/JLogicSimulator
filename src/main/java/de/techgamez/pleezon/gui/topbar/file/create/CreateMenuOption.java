@@ -1,10 +1,7 @@
 package de.techgamez.pleezon.gui.topbar.file.create;
 
 import de.techgamez.pleezon.backend.World;
-import de.techgamez.pleezon.backend.data.impl.gates.ANDGate;
-import de.techgamez.pleezon.backend.data.impl.gates.ORGate;
 import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
-import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
 
 import javax.swing.*;
 import java.io.File;
@@ -58,8 +55,6 @@ public class CreateMenuOption extends JMenuItem {
                     }
                 }
                 World w = new World(f);
-                w.getComponents().put(0L, new WorldComponent(new ANDGate(), 0, 0));
-                w.getComponents().put(1L, new WorldComponent(new ORGate(), 120, 0));
                 gui.fieldPane.setWorld(w);
                 try {
                     w.saveWorld();

@@ -3,7 +3,7 @@ package de.techgamez.pleezon.backend.data.impl.misc;
 import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.backend.data.LogicComponent;
 
-public class Switch extends LogicComponent{
+public class Switch extends LogicComponent {
 
     public Switch() {
         super();
@@ -21,13 +21,13 @@ public class Switch extends LogicComponent{
     }
 
     @Override
-    public boolean hasInputs() {
-        return false;
+    public int maxInputs() {
+        return 0;
     }
 
     @Override
-    public boolean hasOutputs() {
-        return true;
+    public int maxOutputs() {
+        return Integer.MAX_VALUE;
     }
 
     @Override

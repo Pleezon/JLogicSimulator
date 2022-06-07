@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FieldPane extends JPanel {
-    private static final float[] SCALES = {0.1f, 0.5f, 1.0f, 2.0f};
+    private static final float[] SCALES = {0.01f, 0.1f, 0.5f, 1.0f, 2.0f};
     private static final int DEFAULT_SCALE_INDEX = 2;
     private int scaleIndex = DEFAULT_SCALE_INDEX;
     private final Point2D.Float worldOffset = new Point2D.Float(0, 0);
@@ -135,7 +135,6 @@ public class FieldPane extends JPanel {
             public void mouseMoved(MouseEvent e) {
                 super.mouseMoved(e);
                 mousePos = e.getPoint();
-                updateTransform();
             }
         };
         addMouseListener(mouseAdapter);
@@ -167,16 +166,14 @@ public class FieldPane extends JPanel {
 
     private void zoomIn() {
         if (scaleIndex < SCALES.length - 1) {
-            scaleIndex++;
-            updateTransform();
+            modifyZoom(1);
             repaint();
         }
     }
 
     private void zoomOut() {
         if (scaleIndex > 0) {
-            scaleIndex--;
-            updateTransform();
+            modifyZoom(-1);
             repaint();
         }
     }
@@ -190,9 +187,24 @@ public class FieldPane extends JPanel {
         }
     }
 
+    private void modifyZoom(int modifier) {
+        int mx = mousePos == null ? 0 : mousePos.x;
+        int my = mousePos == null ? 0 : mousePos.y;
+        Point2D world_mouseWorldPosBefore = screenToWorld(new Point2D.Float(mx, my));
+        scaleIndex += modifier;
+        updateTransform();
+        Point2D world_mouseWorldPosAfter = screenToWorld(new Point2D.Float(mx, my));
+        Point2D.Float world_offset = new Point2D.Float((float) (world_mouseWorldPosAfter.getX() - world_mouseWorldPosBefore.getX()), (float) (world_mouseWorldPosAfter.getY() - world_mouseWorldPosBefore.getY()));
+        Point2D screen_origin = worldToScreen(new Point2D.Float(0, 0));
+        Point2D screen_offset = worldToScreen(world_offset);
+        worldOffset.x += screen_offset.getX() - screen_origin.getX();
+        worldOffset.y += screen_offset.getY() - screen_origin.getY();
+        updateTransform();
+    }
+
     private void updateTransform() {
         AffineTransform tx = new AffineTransform();
-        tx.translate(getWidth() / 2.0, getHeight() / 2.0);
+        tx.translate((getWidth() / 2.0), (getHeight() / 2.0));
         float s = getScale();
         tx.scale(s, s);
         Point2D.Float trueOffset = getScreenOffset();
