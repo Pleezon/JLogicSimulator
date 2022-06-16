@@ -26,13 +26,14 @@ public class World {
         this(new ComponentMap(), location);
     }
 
-    public void addComponent(WorldComponent component) {
+    public long addComponent(WorldComponent component) {
         long id = 0;
         while (components.containsKey(id)) {
             id = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         }
         components.put(id, component);
         component.component.setID(id);
+        return id;
     }
 
     public void deleteComponent(WorldComponent component) {

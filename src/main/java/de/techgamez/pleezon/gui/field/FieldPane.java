@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FieldPane extends JPanel {
-    private static final float[] SCALES = {0.01f, 0.1f, 0.5f, 1.0f, 2.0f};
+    private static final float[] SCALES = {0.1f, 0.25f, 0.5f, 1.0f, 2.0f};
     private static final int DEFAULT_SCALE_INDEX = 2;
     private int scaleIndex = DEFAULT_SCALE_INDEX;
     private final Point2D.Float worldOffset = new Point2D.Float(0, 0);

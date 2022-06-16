@@ -32,7 +32,8 @@ public class Switch extends LogicComponent {
 
     @Override
     public String texturePath() {
-        return null;
+        return "/textures/misc/Switch.png";
+
     }
 }
 
