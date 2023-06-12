@@ -3,7 +3,7 @@ package de.techgamez.pleezon.backend;
 import de.techgamez.pleezon.backend.data.ComponentMap;
 import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
 import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
-import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
+import de.techgamez.pleezon.gui.field.handler.impl.component.WorldComponent;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -20,10 +20,12 @@ public class World {
 
     private final ComponentMap components;
 
-    private final LogicHandler logicHandler;
+    public final LogicHandler logicHandler;
+
 
     public World(File location) {
-        this(new ComponentMap(), location);
+        this(new ComponentMap(), location, new LogicHandler());
+        logicHandler.setWorld(this);
     }
 
     public long addComponent(WorldComponent component) {
@@ -50,9 +52,10 @@ public class World {
         return componentsToSelect.toArray(new WorldComponent[0]);
     }
 
-    public World(ComponentMap components, File saveLocation) {
+    public World(ComponentMap components, File saveLocation, LogicHandler logicHandler) {
         this.components = components;
-        this.logicHandler = new LogicHandler(this);
+        this.logicHandler = logicHandler;
+        logicHandler.setWorld(this);
         this.file = saveLocation;
     }
 
@@ -65,6 +68,7 @@ public class World {
         file.createNewFile();
         try (BlotterOutputStream bos = new BlotterOutputStream(new FileOutputStream(file))) {
             components.blot(bos);
+            logicHandler.blot(bos);
         }
     }
 
@@ -75,7 +79,9 @@ public class World {
         try (BlotterInputStream bis = new BlotterInputStream(new FileInputStream(file))) {
             ComponentMap components = new ComponentMap();
             components.unblot(bis);
-            return new World(components, file);
+            LogicHandler lh = new LogicHandler();
+            lh.unblot(bis);
+            return new World(components, file, lh);
         }
     }
 

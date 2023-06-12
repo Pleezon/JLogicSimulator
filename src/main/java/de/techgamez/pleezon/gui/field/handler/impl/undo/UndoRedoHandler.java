@@ -1,8 +1,8 @@
-package de.techgamez.pleezon.gui.field.actions.impl.undo;
+package de.techgamez.pleezon.gui.field.handler.impl.undo;
 
 import de.techgamez.pleezon.Constants;
 import de.techgamez.pleezon.gui.field.FieldPane;
-import de.techgamez.pleezon.gui.field.actions.ActionHandler;
+import de.techgamez.pleezon.gui.field.handler.ActionHandler;
 import de.techgamez.pleezon.misc.SizedStack;
 
 import javax.swing.*;

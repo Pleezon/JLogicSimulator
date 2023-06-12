@@ -70,7 +70,7 @@ public abstract class LogicComponent implements Blottable {
     /*
      * Updates the component and returns -1 if the state hasn't changed, otherwise returns the amount of ticks in which to update it's kids
      */
-    public abstract int triggerUpdate(World world);
+    public abstract int triggerUpdate(boolean[] inputs);
 
     public abstract int triggerClick(World world);
 
@@ -104,6 +104,14 @@ public abstract class LogicComponent implements Blottable {
     public void addInput(long input) throws IllegalStateModificationException {
         checkInputModification();
         this.inputs.add(input);
+    }
+
+    public boolean hasInput(long input) {
+        return this.inputs.contains(input);
+    }
+
+    public boolean hasOutput(long input) {
+        return this.outputs.contains(input);
     }
 
     public void removeInput(long input) throws IllegalStateModificationException {

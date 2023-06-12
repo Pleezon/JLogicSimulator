@@ -1,9 +1,9 @@
-package de.techgamez.pleezon.gui.field.actions.impl.select;
+package de.techgamez.pleezon.gui.field.handler.impl.select;
 
 import de.techgamez.pleezon.gui.field.FieldPane;
-import de.techgamez.pleezon.gui.field.actions.ActionHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
-import de.techgamez.pleezon.gui.field.actions.impl.undo.UndoableRedoable;
+import de.techgamez.pleezon.gui.field.handler.ActionHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.component.WorldComponent;
+import de.techgamez.pleezon.gui.field.handler.impl.undo.UndoableRedoable;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -66,6 +66,7 @@ public class SelectionDragHandler extends ActionHandler {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (gui.wireDragHandler.startComponent != null) return;
                 super.mousePressed(e);
                 totalDragOffset = null;
                 lastCursorPosition = null;
@@ -74,6 +75,7 @@ public class SelectionDragHandler extends ActionHandler {
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
+                if (gui.wireDragHandler.startComponent != null) return;
                 if (totalDragOffset != null) {
                     finalizeDrag();
                     totalDragOffset = null;
@@ -85,6 +87,7 @@ public class SelectionDragHandler extends ActionHandler {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
+                if (gui.wireDragHandler.startComponent != null) return;
                 if (gui.getMouseClickButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown()) {
                     totalDragOffset = new Point((gui.getMouseClickPoint().x - e.getX()), (gui.getMouseClickPoint().y - e.getY()));
                     if (lastCursorPosition == null) {

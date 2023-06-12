@@ -24,12 +24,10 @@ public abstract class LogicGate extends LogicComponent {
     handling of a logic-gate's update-method; Made easier because of logic gates
     only needing the amount of active and total inputs to compute their state
      */
-    public int triggerUpdate(World world) {
+    public int triggerUpdate(boolean[] ins) {
         int amoActive = 0;
-        for (long input : this.inputs) {
-            if (world.getComponents().get(input).component.getState()) {
-                amoActive++;
-            }
+        for (boolean in : ins) {
+            if (in) amoActive++;
         }
         if (this.state(amoActive, this.inputs.size())) {
             if (this.getState()) return -1;
@@ -38,7 +36,7 @@ public abstract class LogicGate extends LogicComponent {
             if (!this.getState()) return -1;
             setState(false);
         }
-        return 1;
+        return 0;
     }
 
     /*

@@ -1,4 +1,4 @@
-package de.techgamez.pleezon.gui.field.actions.impl.component;
+package de.techgamez.pleezon.gui.field.handler.impl.component;
 
 import de.techgamez.pleezon.backend.data.LogicComponent;
 import de.techgamez.pleezon.backend.data.save.Blottable;
@@ -20,10 +20,12 @@ public class WorldComponent implements Blottable {
         private static class CacheKey {
             public WorldComponent.ComponentState state;
             Class<? extends LogicComponent> clazz;
+            boolean actuated = false;
 
-            public CacheKey(Class<? extends LogicComponent> clazz, WorldComponent.ComponentState state) {
+            public CacheKey(Class<? extends LogicComponent> clazz, WorldComponent.ComponentState state, boolean actuated) {
                 this.clazz = clazz;
                 this.state = state;
+                this.actuated = actuated;
             }
 
             @Override
@@ -31,19 +33,19 @@ public class WorldComponent implements Blottable {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
                 CacheKey cacheKey = (CacheKey) o;
-                return state == cacheKey.state && clazz.equals(cacheKey.clazz);
+                return state == cacheKey.state && clazz.equals(cacheKey.clazz) && cacheKey.actuated == this.actuated;
             }
 
             @Override
             public int hashCode() {
-                return Objects.hash(state, clazz);
+                return Objects.hash(state, clazz, actuated);
             }
         }
 
         private final HashMap<CacheKey, BufferedImage> cache = new HashMap<>();
 
         public BufferedImage retrieve(WorldComponent component) throws IOException {
-            CacheKey key = new CacheKey(component.component.getClass(), component.state);
+            CacheKey key = new CacheKey(component.component.getClass(), component.state, component.component.getState());
             if (cache.containsKey(key)) {
                 return cache.get(key);
             }
@@ -85,20 +87,30 @@ public class WorldComponent implements Blottable {
         this.state = ComponentState.NORMAL;
     }
 
-    public boolean isIn(Rectangle rectangle) {
+    private BufferedImage retrieveTexture() {
         BufferedImage texture;
         try {
             texture = cache.retrieve(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Rectangle bounds = new Rectangle(
-                (int) x,
-                (int) y,
-                texture.getWidth(),
-                texture.getHeight()
-        );
+        return texture;
+    }
+
+    public boolean isIn(Rectangle rectangle) {
+        Rectangle bounds = getTextureBounds();
         return rectangle.intersects(bounds);
+    }
+
+    public Rectangle getTextureBounds() {
+        BufferedImage image = retrieveTexture();
+        Rectangle bounds = new Rectangle((int) x, (int) y, image.getWidth(), image.getHeight());
+        return bounds;
+    }
+
+    public Point2D.Float getMiddlePoint() {
+        Rectangle r = getTextureBounds();
+        return new Point2D.Float((float) r.getCenterX(), (float) r.getCenterY());
     }
 
     public boolean isInHitbox(Point2D point, boolean ignoreTransparent) {
@@ -107,12 +119,7 @@ public class WorldComponent implements Blottable {
         if (x < this.x || y < this.y) {
             return false;
         }
-        BufferedImage texture;
-        try {
-            texture = cache.retrieve(this);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        BufferedImage texture = retrieveTexture();
         x -= this.x;
         y -= this.y;
         if (x >= texture.getWidth() || y >= texture.getHeight()) {
@@ -139,6 +146,9 @@ public class WorldComponent implements Blottable {
     private BufferedImage texture() throws IOException {
         BufferedImage texture = ImageIO.read(Objects.requireNonNull(getClass().getResource(component.texturePath())));
         Color c = this.state == ComponentState.SELECTED ? javax.swing.UIManager.getDefaults().getColor("Component.focusColor") : javax.swing.UIManager.getDefaults().getColor("Component.linkColor");
+        if (component.getState()) {
+            c = Color.RED;
+        }
         for (int x = 0; x < texture.getWidth(); x++) {
             for (int y = 0; y < texture.getHeight(); y++) {
                 int argb = texture.getRGB(x, y);
@@ -159,6 +169,7 @@ public class WorldComponent implements Blottable {
         try {
             BufferedImage texture = cache.retrieve(this);
             g.drawImage(texture, null, (int) x - offX, (int) y - offY);
+            g.drawString(Long.toString(component.getID()), (int) getMiddlePoint().getX(), (int) getMiddlePoint().getY());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

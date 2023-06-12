@@ -1,11 +1,13 @@
-package de.techgamez.pleezon.gui.field.actions.impl.select;
+package de.techgamez.pleezon.gui.field.handler.impl.select;
 
+import de.techgamez.pleezon.Constants;
 import de.techgamez.pleezon.backend.data.save.BlotterInputStream;
 import de.techgamez.pleezon.backend.data.save.BlotterOutputStream;
 import de.techgamez.pleezon.gui.field.FieldPane;
-import de.techgamez.pleezon.gui.field.actions.ActionHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
-import de.techgamez.pleezon.gui.field.actions.impl.undo.UndoableRedoable;
+import de.techgamez.pleezon.gui.field.handler.ActionHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.component.WorldComponent;
+import de.techgamez.pleezon.gui.field.handler.impl.undo.UndoableRedoable;
+import de.techgamez.pleezon.misc.SizedStack;
 
 import javax.swing.*;
 import java.awt.*;
@@ -138,6 +140,7 @@ public class SelectionHandler extends ActionHandler {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
+                if (gui.wireDragHandler.startComponent != null) return;
                 if (gui.getWorld() == null) return;
                 if (gui.getMouseClickButton() == MouseEvent.BUTTON1 && e.isAltDown() && !e.isControlDown()) {
 
@@ -156,6 +159,7 @@ public class SelectionHandler extends ActionHandler {
 
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
+                if (gui.wireDragHandler.startComponent != null) return;
                 super.mouseWheelMoved(e);
                 if (gui.getMouseClickButton() != null && gui.getMouseClickButton() == MouseEvent.BUTTON1 && (e.isControlDown() || e.isAltDown())) {
                     updateSelection(e.getPoint());
@@ -166,6 +170,7 @@ public class SelectionHandler extends ActionHandler {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (gui.getWorld() == null) return;
+                if (gui.wireDragHandler.startComponent != null) return;
                 boolean isUnselect = !e.isAltDown() && e.isControlDown();
                 boolean isSelect = e.isAltDown() && !e.isControlDown();
                 if (e.getButton() == MouseEvent.BUTTON1 && (isSelect || isUnselect)) {
@@ -177,7 +182,7 @@ public class SelectionHandler extends ActionHandler {
                         public void redo() {
                             // only select the first component so that stacked components aren't un-stackable
                             if (components.length == 0) return;
-                            WorldComponent component = components[0];
+                            WorldComponent component = components[components.length - 1];
                             if (type == SelectionType.SELECT) {
                                 component.setState(WorldComponent.ComponentState.SELECTED);
                                 selectedComponents.add(component);
@@ -191,7 +196,7 @@ public class SelectionHandler extends ActionHandler {
                         @Override
                         public void undo() {
                             if (components.length == 0) return;
-                            WorldComponent component = components[0];
+                            WorldComponent component = components[components.length - 1];
                             if (type != SelectionType.SELECT) {
                                 component.setState(WorldComponent.ComponentState.SELECTED);
                                 selectedComponents.add(component);
@@ -256,13 +261,16 @@ public class SelectionHandler extends ActionHandler {
                             for (WorldComponent component : components) {
                                 gui.getWorld().deleteComponent(component);
                             }
+                            selectedComponents.clear();
                             gui.repaint();
                         }
 
                         @Override
                         public void undo() {
+                            selectedComponents.clear();
                             for (WorldComponent component : components) {
                                 gui.getWorld().addComponent(component);
+                                selectedComponents.add(component);
                             }
                             gui.repaint();
                         }
@@ -281,7 +289,6 @@ public class SelectionHandler extends ActionHandler {
                 }
             }
         });
-        //TODO: add paste to undoRedoHandler :(
         map.put("pasteSelection", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -313,8 +320,6 @@ public class SelectionHandler extends ActionHandler {
             }
             selectedComponents.clear();
             WorldComponent[] components = getClipboardComponents();
-            Point p = gui.getMousePosition();
-            Point2D world_mousePos = gui.screenToWorld(new Point2D.Float((float) p.getX(), (float) p.getY()));
 
             int totalX = 0;
             int totalY = 0;
@@ -324,12 +329,15 @@ public class SelectionHandler extends ActionHandler {
             }
             int avgX = (int) (totalX / (double) components.length);
             int avgY = (int) (totalY / (double) components.length);
-
+            SizedStack<Point2D> mousePositions = new SizedStack<>(Constants.undoRedoCap);
 
             UndoableRedoable action = new UndoableRedoable() {
                 @Override
                 public void redo() {
                     selectedComponents.clear();
+                    Point p = gui.getMousePosition();
+                    Point2D world_mousePos = gui.screenToWorld(new Point2D.Float((float) p.getX(), (float) p.getY()));
+                    mousePositions.add(world_mousePos);
                     for (WorldComponent component : components) {
                         component.x -= avgX;
                         component.y -= avgY;
@@ -344,7 +352,14 @@ public class SelectionHandler extends ActionHandler {
 
                 @Override
                 public void undo() {
+                    Point2D world_mousePos = mousePositions.pop();
                     for (WorldComponent component : components) {
+                        component.x += avgX;
+                        component.y += avgY;
+                        component.x -= world_mousePos.getX();
+                        component.y -= world_mousePos.getY();
+
+
                         gui.getWorld().deleteComponent(component);
                     }
                     selectedComponents.clear();

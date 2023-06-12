@@ -2,7 +2,6 @@ package de.techgamez.pleezon.gui.topbar.file.open;
 
 import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
-import de.techgamez.pleezon.gui.field.actions.impl.component.WorldComponent;
 
 import javax.swing.*;
 import java.io.File;
@@ -45,10 +44,6 @@ public class OpenMenuOption extends JMenuItem {
                     String path = fc.getSelectedFile().getAbsolutePath();
                     if (!path.endsWith(".jls")) path += ".jls";
                     World w = World.fromFile(new File(path));
-                    System.out.println("loaded:");
-                    for (WorldComponent value : w.getComponents().values()) {
-                        System.out.println(value.component.getClass().getName());
-                    }
                     gui.fieldPane.setWorld(w);
 
                 } catch (IOException ex) {

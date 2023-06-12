@@ -1,4 +1,4 @@
-package de.techgamez.pleezon.gui.field.actions.impl.undo;
+package de.techgamez.pleezon.gui.field.handler.impl.undo;
 
 public interface UndoableRedoable {
     void redo();

@@ -10,7 +10,7 @@ public class Switch extends LogicComponent {
     }
 
     @Override
-    public int triggerUpdate(World world) {
+    public int triggerUpdate(boolean[] inputs) {
         return -1;
     }
 

@@ -1,4 +1,4 @@
-package de.techgamez.pleezon.gui.field.actions;
+package de.techgamez.pleezon.gui.field.handler;
 
 import de.techgamez.pleezon.gui.field.FieldPane;
 

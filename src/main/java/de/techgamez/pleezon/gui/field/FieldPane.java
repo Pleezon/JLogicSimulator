@@ -2,11 +2,12 @@ package de.techgamez.pleezon.gui.field;
 
 import de.techgamez.pleezon.backend.World;
 import de.techgamez.pleezon.gui.JLogicSimulatorGUI;
-import de.techgamez.pleezon.gui.field.actions.ActionHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.component.ComponentHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.select.SelectionDragHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.select.SelectionHandler;
-import de.techgamez.pleezon.gui.field.actions.impl.undo.UndoRedoHandler;
+import de.techgamez.pleezon.gui.field.handler.ActionHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.component.ComponentHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.select.SelectionDragHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.select.SelectionHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.undo.UndoRedoHandler;
+import de.techgamez.pleezon.gui.field.handler.impl.wire.WireDragHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,8 +18,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FieldPane extends JPanel {
-    private static final float[] SCALES = {0.1f, 0.25f, 0.5f, 1.0f, 2.0f};
-    private static final int DEFAULT_SCALE_INDEX = 2;
+    private static final float[] SCALES = {0.1f, 0.25f, 0.5f, 1.0f, 2.0f, 3.0f};
+    private static final int DEFAULT_SCALE_INDEX = 3;
     private int scaleIndex = DEFAULT_SCALE_INDEX;
     private final Point2D.Float worldOffset = new Point2D.Float(0, 0);
     private Point2D.Float cameraMoveDragOffset = null;
@@ -56,12 +57,15 @@ public class FieldPane extends JPanel {
 
     public final UndoRedoHandler undoRedoHandler = new UndoRedoHandler(this);
     public final ComponentHandler componentHandler = new ComponentHandler(this);
+    public final WireDragHandler wireDragHandler = new WireDragHandler(this);
 
     private void initActions() {
         actions.add(undoRedoHandler);
         actions.add(selectionHandler);
         actions.add(selectionDragHandler);
         actions.add(componentHandler);
+        actions.add(wireDragHandler);
+
     }
 
     private void resetView() {
